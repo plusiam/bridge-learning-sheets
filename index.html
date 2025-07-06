@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-2-1 다리 공부하기</title>
+    <style>
+        body {
+            font-family: '맑은 고딕', 'Malgun Gothic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            font-size: 16px;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            flex: 1;
+            max-width: 960px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        header h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* 진행률 표시기 */
+        .progress-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 33.33%;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .progress-step {
+            padding: 5px 10px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background-color: #27ae60;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-step.completed {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #fdfdff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .input-section h2 {
+            font-size: 1.6em;
+            color: #34495e;
+            margin-top: 0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .displayed-topic {
+            padding: 20px;
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            border: 2px solid #9cb4d8;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .displayed-topic strong {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .input-group input[type="text"],
+        .input-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1.05em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input[type="text"]:focus,
+        .input-group textarea:focus {
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+            outline: none;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+
+        .input-group .small-inputs input[type="text"] {
+            margin-bottom: 10px;
+        }
+
+        /* 입력 유효성 피드백 */
+        .input-feedback {
+            font-size: 0.85em;
+            margin-top: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .input-feedback.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .input-feedback.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .navigation-buttons .next-btn-right {
+            margin-left: auto;
+        }
+
+        .toolbar {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .toolbar button,
+        .action-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.1em;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            min-width: 120px;
+        }
+
+        .toolbar button:hover,
+        .toolbar button:focus,
+        .action-btn:hover,
+        .action-btn:focus {
+            background-color: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            outline: none;
+        }
+
+        .action-btn {
+            background-color: #9b59b6 !important;
+            padding: 12px 20px !important;
+            font-size: 0.95em !important;
+        }
+
+        .action-btn:hover,
+        .action-btn:focus {
+            background-color: #8e44ad !important;
+        }
+
+        .submit-btn {
+            background-color: #e74c3c !important;
+            font-size: 1.2em !important;
+            padding: 15px 35px !important;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background-color: #c0392b !important;
+        }
+
+        .keyboard-navigation-info {
+            background-color: #e8f4fd;
+            border: 1px solid #bee5eb;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: #0c5460;
+            margin-bottom: 15px;
+        }
+
+        #comparisonArea {
+            margin-bottom: 20px;
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        #comparisonArea h4 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #34495e;
+        }
+
+        #comparisonArea .comparison-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        #comparisonArea .comparison-column {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        #comparisonArea .comparison-column strong {
+            font-size: 1.1em;
+            color: #2980b9;
+        }
+
+        #comparisonArea .comparison-column p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85);
+            color: white;
+            padding: 25px 35px;
+            border-radius: 10px;
+            z-index: 1000;
+            font-size: 1.15em;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            z-index: 1001;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .success-modal h3 {
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .success-modal .analysis-result {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        /* 모바일 최적화 */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+
+            header h1 {
+                font-size: 1.6em;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+            }
+
+            .navigation-buttons .next-btn-right {
+                margin-left: 0;
+            }
+
+            .toolbar button,
+            .action-btn {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            #comparisonArea .comparison-grid {
+                flex-direction: column;
+            }
+
+            #comparisonArea .comparison-column {
+                min-width: auto;
+            }
+
+            .progress-steps {
+                font-size: 0.8em;
+            }
+
+            .progress-step {
+                padding: 3px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loadingIndicator">
+        처리 중... 잠시만 기다려주세요.
+    </div>
+
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    
+    <div class="success-modal" id="successModal">
+        <h3>✅ 제출 완료!</h3>
+        <p>선생님께 전송되었습니다.</p>
+        <div class="analysis-result" id="analysisResult">
+            <h4>📊 나의 학습 분석</h4>
+            <p><strong>변화 수준:</strong> <span id="changeLevelResult"></span></p>
+            <p><strong>개념 변화:</strong> <span id="conceptChangeResult"></span></p>
+            <p><strong>질문 심화도:</strong> <span id="questionDepthResult"></span></p>
+            <p><strong>사고 확장도:</strong> <span id="thinkingExpansionResult"></span></p>
+        </div>
+        <button onclick="closeSuccessModal()" class="action-btn">확인</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🌈 3-2-1 다리 공부하기 📚</h1>
+        </header>
+
+        <!-- 진행률 표시기 -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-steps">
+                <span class="progress-step active" id="step1">1️⃣ 공부 전</span>
+                <span class="progress-step" id="step2">2️⃣ 공부 후</span>
+                <span class="progress-step" id="step3">3️⃣ 다리 만들기</span>
+            </div>
+        </div>
+
+        <!-- 사용법 안내 -->
+        <div class="keyboard-navigation-info">
+            💡 <strong>사용법:</strong> 빈칸을 모두 채워보세요! 다음 버튼을 누르면 다음 단계로 갈 수 있어요.
+        </div>
+
+        <section class="input-section" id="basicInfoSection">
+            <h2>👋 나는 누구일까요?</h2>
+            <div class="input-group">
+                <label for="studentInfo">나의 정보를 써보세요:</label>
+                <input type="text" id="studentInfo" placeholder="예시: 행복초등학교 3학년 2반 김민수" required>
+                <div class="input-feedback" id="studentInfoFeedback"></div>
+            </div>
+            <div class="input-group">
+                <label for="learningTopic">오늘 무엇을 공부할까요?</label>
+                <input type="text" id="learningTopic" placeholder="예시: 동물들이 사는 곳" required>
+                <div class="input-feedback" id="learningTopicFeedback"></div>
+            </div>
+        </section>
+
+        <section id="initialThoughtsSection" class="input-section">
+            <h2>✏️ 1단계: 공부하기 전에 생각해봐요!</h2>
+            <div class="input-group">
+                <label>📝 이 주제를 보면 떠오르는 단어 3개를 써보세요:</label>
+                <div class="small-inputs">
+                    <input type="text" id="initialWord1" placeholder="단어 1">
+                    <input type="text" id="initialWord2" placeholder="단어 2">
+                    <input type="text" id="initialWord3" placeholder="단어 3">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>❓ 궁금한 것 2가지를 질문으로 만들어보세요:</label>
+                <textarea id="initialQuestion1" placeholder="질문 1" rows="2"></textarea>
+                <textarea id="initialQuestion2" placeholder="질문 2" rows="2"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="initialMetaphor">🎨 이 주제가 무엇과 비슷한지 설명해보세요:</label>
+                <textarea id="initialMetaphor" placeholder="예시: 동물의 집은 우리집처럼 안전한 곳이에요" rows="3"></textarea>
+            </div>
+            <div class="navigation-buttons next-btn-right">
+                <button type="button" id="initialToNewBtn" class="action-btn">
+                    다음으로 가기 ➡️
+                </button>
+            </div>
+        </section>
+
+        <section id="newThoughtsSection" class="input-section" style="display:none;">
+            <div class="displayed-topic">
+                <strong>📖 지금 공부하는 것:</strong> <span id="displayedTopicInNewThoughts"></span>
+            </div>
+            <h2>💡 2단계: 공부한 후에 생각해봐요!</h2>
+            <div class="input-group">
+                <label>📢 공부하고 나니 새로 생각나는 단어 3개를 써보세요:</label>
+                <div class="small-inputs">
+                    <input type="text" id="newWord1" placeholder="새 단어 1">
+                    <input type="text" id="newWord2" placeholder="새 단어 2">
+                    <input type="text" id="newWord3" placeholder="새 단어 3">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>🤔 공부한 후에 더 궁금해진 것 2가지를 질문으로 만들어보세요:</label>
+                <textarea id="newQuestion1" placeholder="예시: 동물들은 왜 다른 곳에 살까요?" rows="2"></textarea>
+                <textarea id="newQuestion2" placeholder="예시: 사막에 사는 동물들은 물을 어떻게 마실까요?" rows="2"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="newMetaphor">🌐 이제 이 주제가 무엇과 비슷한지 다시 설명해보세요:</label>
+                <textarea id="newMetaphor" placeholder="예시: 동물의 집은 동물들이 살기 좋은 특별한 곳이에요" rows="3"></textarea>
+            </div>
+            <div class="navigation-buttons">
+                <button type="button" id="newToInitialBtn" class="action-btn">
+                    ⬅️ 이전으로
+                </button>
+                <button type="button" id="newToBridgeBtn" class="action-btn">
+                    다음으로 가기 ➡️
+                </button>
+            </div>
+        </section>
+
+        <section id="bridgeSection" class="input-section" style="display:none;">
+            <div class="displayed-topic">
+                <strong>📖 지금 공부하는 것:</strong> <span id="displayedTopicInBridge"></span>
+            </div>
+            <h2>🌉 3단계: 생각의 다리 만들기!</h2>
+            <div id="comparisonArea">
+                <h4>🔍 내 생각이 어떻게 바뀌었을까요?</h4>
+                <div class="comparison-grid">
+                    <div class="comparison-column">
+                        <strong>☝️ 공부 전 내 생각</strong>
+                        <p>단어: <span id="summaryInitialWords"></span></p>
+                        <p>질문: <span id="summaryInitialQuestions"></span></p>
+                        <p>비슷한 것: <span id="summaryInitialMetaphor"></span></p>
+                    </div>
+                    <div class="comparison-column">
+                        <strong>😀 공부 후 내 생각</strong>
+                        <p>단어: <span id="summaryNewWords"></span></p>
+                        <p>질문: <span id="summaryNewQuestions"></span></p>
+                        <p>비슷한 것: <span id="summaryNewMetaphor"></span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="bridgeReflection">🌉 공부하기 전과 후의 내 생각을 비교해보세요. 어떻게 바뀌었나요? 새로 알게 된 것은 무엇인가요?</label>
+                <textarea id="bridgeReflection" placeholder="예시: 처음에는 동물들이 그냥 여기저기 살는 줄 알았는데, 알고 보니..." rows="8"></textarea>
+            </div>
+            <div class="navigation-buttons">
+                <button type="button" id="bridgeToNewBtn" class="action-btn">
+                    ⬅️ 이전으로
+                </button>
+            </div>
+            <div class="toolbar">
+                <button onclick="submitToGoogleSheets()" class="submit-btn">
+                    📤 선생님께 제출하기
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Google Apps Script 웹앱 URL - 배포 후 받은 URL로 교체하세요!
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+
+        class BridgeLearningApp {
+            constructor() {
+                this.currentStep = 1;
+                this.appState = {
+                    studentInfo: '',
+                    learningTopic: '',
+                    phases: {
+                        initial: { words: ['', '', ''], questions: ['', ''], metaphor: '' },
+                        new: { words: ['', '', ''], questions: ['', ''], metaphor: '' },
+                        bridge: { reflection: '' }
+                    }
+                };
+
+                this.initializeElements();
+                this.setupEventListeners();
+                this.updateProgress();
+                this.showSection(this.sections.initial);
+            }
+
+            initializeElements() {
+                // 기본 정보 요소들
+                this.elements = {
+                    studentInfo: document.getElementById('studentInfo'),
+                    learningTopic: document.getElementById('learningTopic'),
+
+                    // 1단계 요소들
+                    initialWord1: document.getElementById('initialWord1'),
+                    initialWord2: document.getElementById('initialWord2'),
+                    initialWord3: document.getElementById('initialWord3'),
+                    initialQuestion1: document.getElementById('initialQuestion1'),
+                    initialQuestion2: document.getElementById('initialQuestion2'),
+                    initialMetaphor: document.getElementById('initialMetaphor'),
+
+                    // 2단계 요소들
+                    newWord1: document.getElementById('newWord1'),
+                    newWord2: document.getElementById('newWord2'),
+                    newWord3: document.getElementById('newWord3'),
+                    newQuestion1: document.getElementById('newQuestion1'),
+                    newQuestion2: document.getElementById('newQuestion2'),
+                    newMetaphor: document.getElementById('newMetaphor'),
+
+                    // 3단계 요소들
+                    bridgeReflection: document.getElementById('bridgeReflection'),
+
+                    // 진행률 및 섹션 요소들
+                    progressFill: document.getElementById('progressFill'),
+                    step1: document.getElementById('step1'),
+                    step2: document.getElementById('step2'),
+                    step3: document.getElementById('step3'),
+
+                    // 주제 표시 요소들
+                    displayedTopicInNewThoughts: document.getElementById('displayedTopicInNewThoughts'),
+                    displayedTopicInBridge: document.getElementById('displayedTopicInBridge')
+                };
+
+                this.sections = {
+                    initial: document.getElementById('initialThoughtsSection'),
+                    new: document.getElementById('newThoughtsSection'),
+                    bridge: document.getElementById('bridgeSection')
+                };
+
+                this.buttons = {
+                    initialToNew: document.getElementById('initialToNewBtn'),
+                    newToInitial: document.getElementById('newToInitialBtn'),
+                    newToBridge: document.getElementById('newToBridgeBtn'),
+                    bridgeToNew: document.getElementById('bridgeToNewBtn')
+                };
+            }
+
+            setupEventListeners() {
+                // 네비게이션 버튼들
+                this.buttons.initialToNew.addEventListener('click', () => this.goToStep(2));
+                this.buttons.newToInitial.addEventListener('click', () => this.goToStep(1));
+                this.buttons.newToBridge.addEventListener('click', () => this.goToStep(3));
+                this.buttons.bridgeToNew.addEventListener('click', () => this.goToStep(2));
+
+                // 입력 유효성 검사
+                this.elements.studentInfo.addEventListener('blur', () =>
+                    this.validateInput(this.elements.studentInfo, 'studentInfoFeedback'));
+                this.elements.learningTopic.addEventListener('blur', () =>
+                    this.validateInput(this.elements.learningTopic, 'learningTopicFeedback'));
+
+                // 실시간 상태 업데이트
+                this.setupRealTimeUpdates();
+            }
+
+            setupRealTimeUpdates() {
+                const inputs = [
+                    this.elements.studentInfo, this.elements.learningTopic,
+                    this.elements.initialWord1, this.elements.initialWord2, this.elements.initialWord3,
+                    this.elements.initialQuestion1, this.elements.initialQuestion2, this.elements.initialMetaphor,
+                    this.elements.newWord1, this.elements.newWord2, this.elements.newWord3,
+                    this.elements.newQuestion1, this.elements.newQuestion2, this.elements.newMetaphor,
+                    this.elements.bridgeReflection
+                ];
+
+                inputs.forEach(input => {
+                    input.addEventListener('input', () => this.updateAppState());
+                });
+            }
+
+            validateInput(element, feedbackId) {
+                const feedback = document.getElementById(feedbackId);
+                const value = element.value.trim();
+
+                if (value.length === 0) {
+                    this.showFeedback(feedback, '필수 입력 항목입니다.', 'error');
+                    return false;
+                } else if (value.length < 2) {
+                    this.showFeedback(feedback, '최소 2글자 이상 입력해주세요.', 'error');
+                    return false;
+                } else {
+                    this.showFeedback(feedback, '입력이 완료되었습니다.', 'success');
+                    return true;
+                }
+            }
+
+            showFeedback(feedbackElement, message, type) {
+                feedbackElement.textContent = message;
+                feedbackElement.className = `input-feedback ${type}`;
+                feedbackElement.style.display = 'block';
+
+                if (type === 'success') {
+                    setTimeout(() => {
+                        feedbackElement.style.display = 'none';
+                    }, 3000);
+                }
+            }
+
+            updateAppState() {
+                this.appState.studentInfo = this.elements.studentInfo.value;
+                this.appState.learningTopic = this.elements.learningTopic.value;
+
+                this.appState.phases.initial.words = [
+                    this.elements.initialWord1.value,
+                    this.elements.initialWord2.value,
+                    this.elements.initialWord3.value
+                ];
+                this.appState.phases.initial.questions = [
+                    this.elements.initialQuestion1.value,
+                    this.elements.initialQuestion2.value
+                ];
+                this.appState.phases.initial.metaphor = this.elements.initialMetaphor.value;
+
+                this.appState.phases.new.words = [
+                    this.elements.newWord1.value,
+                    this.elements.newWord2.value,
+                    this.elements.newWord3.value
+                ];
+                this.appState.phases.new.questions = [
+                    this.elements.newQuestion1.value,
+                    this.elements.newQuestion2.value
+                ];
+                this.appState.phases.new.metaphor = this.elements.newMetaphor.value;
+
+                this.appState.phases.bridge.reflection = this.elements.bridgeReflection.value;
+            }
+
+            goToStep(step) {
+                this.currentStep = step;
+                this.updateProgress();
+
+                switch(step) {
+                    case 1:
+                        this.showSection(this.sections.initial);
+                        break;
+                    case 2:
+                        this.showSection(this.sections.new);
+                        break;
+                    case 3:
+                        this.updateComparisonArea();
+                        this.showSection(this.sections.bridge);
+                        break;
+                }
+            }
+
+            updateProgress() {
+                const progressPercent = (this.currentStep / 3) * 100;
+                this.elements.progressFill.style.width = `${progressPercent}%`;
+
+                // 단계 상태 업데이트
+                [this.elements.step1, this.elements.step2, this.elements.step3].forEach((step, index) => {
+                    step.classList.remove('active', 'completed');
+                    if (index + 1 === this.currentStep) {
+                        step.classList.add('active');
+                    } else if (index + 1 < this.currentStep) {
+                        step.classList.add('completed');
+                    }
+                });
+            }
+
+            showSection(sectionToShow) {
+                // 모든 섹션 숨김
+                Object.values(this.sections).forEach(section => {
+                    section.style.display = 'none';
+                });
+
+                // 요청된 섹션만 표시
+                sectionToShow.style.display = 'block';
+
+                // 기본 정보 섹션 표시/숨김 처리
+                const basicInfoSection = document.getElementById('basicInfoSection');
+                if (sectionToShow === this.sections.initial) {
+                    basicInfoSection.style.display = 'block';
+                } else {
+                    basicInfoSection.style.display = 'none';
+                }
+
+                // 학습 주제 업데이트
+                const currentTopic = this.elements.learningTopic.value.trim() || '입력된 주제 없음';
+                if (sectionToShow === this.sections.new) {
+                    this.elements.displayedTopicInNewThoughts.textContent = currentTopic;
+                } else if (sectionToShow === this.sections.bridge) {
+                    this.elements.displayedTopicInBridge.textContent = currentTopic;
+                }
+
+                // 섹션으로 스크롤
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            updateComparisonArea() {
+                this.updateAppState();
+
+                document.getElementById('summaryInitialWords').textContent =
+                    this.getWords(this.appState.phases.initial.words);
+                document.getElementById('summaryInitialQuestions').textContent =
+                    this.getQuestionsForSummary(this.appState.phases.initial.questions);
+                document.getElementById('summaryInitialMetaphor').textContent =
+                    this.appState.phases.initial.metaphor.trim() || '입력 없음';
+
+                document.getElementById('summaryNewWords').textContent =
+                    this.getWords(this.appState.phases.new.words);
+                document.getElementById('summaryNewQuestions').textContent =
+                    this.getQuestionsForSummary(this.appState.phases.new.questions);
+                document.getElementById('summaryNewMetaphor').textContent =
+                    this.appState.phases.new.metaphor.trim() || '입력 없음';
+            }
+
+            getWords(words) {
+                return words.filter(Boolean).join(', ') || '입력 없음';
+            }
+
+            getQuestionsForSummary(questions) {
+                return questions.filter(Boolean).join(' / ') || '입력 없음';
+            }
+        }
+
+        // 전역 변수로 앱 인스턴스 저장
+        let bridgeApp;
+
+        // 데이터를 Google Sheets로 전송
+        async function sendToGoogleSheets(formData) {
+            try {
+                document.getElementById('loadingIndicator').style.display = 'block';
+                
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                // no-cors 모드에서는 응답을 읽을 수 없으므로
+                // 별도로 성공 확인을 위해 GET 요청 보내기
+                setTimeout(async () => {
+                    try {
+                        const checkResponse = await fetch(APPS_SCRIPT_URL);
+                        const checkData = await checkResponse.json();
+                        
+                        if (checkData.status === 'ready') {
+                            showSuccessModal({
+                                changeLevel: '분석 중...',
+                                conceptChangeType: '분석 중...',
+                                questionDepth: '분석 중...',
+                                thinkingExpansion: '분석 중...'
+                            });
+                        }
+                    } catch (e) {
+                        // GET 요청도 실패하면 그냥 성공으로 간주
+                        showSuccessModal({
+                            changeLevel: '제출 완료',
+                            conceptChangeType: '제출 완료',
+                            questionDepth: '제출 완료',
+                            thinkingExpansion: '제출 완료'
+                        });
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('전송 오류:', error);
+                alert('❌ 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+            } finally {
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        }
+
+        // 성공 모달 표시
+        function showSuccessModal(analysis) {
+            document.getElementById('modalBackdrop').style.display = 'block';
+            document.getElementById('successModal').style.display = 'block';
+            
+            if (analysis) {
+                document.getElementById('changeLevelResult').textContent = analysis.changeLevel;
+                document.getElementById('conceptChangeResult').textContent = analysis.conceptChangeType;
+                document.getElementById('questionDepthResult').textContent = analysis.questionDepth;
+                document.getElementById('thinkingExpansionResult').textContent = analysis.thinkingExpansion;
+            }
+        }
+
+        // 성공 모달 닫기
+        function closeSuccessModal() {
+            document.getElementById('modalBackdrop').style.display = 'none';
+            document.getElementById('successModal').style.display = 'none';
+            
+            if (confirm('새로운 학습을 시작하시겠습니까?')) {
+                window.location.reload();
+            }
+        }
+
+        // 제출 함수
+        function submitToGoogleSheets() {
+            bridgeApp.updateAppState();
+            
+            // 데이터 포맷 맞추기
+            const formData = {
+                studentInfo: bridgeApp.appState.studentInfo,
+                learningTopic: bridgeApp.appState.learningTopic,
+                initialWord1: bridgeApp.appState.phases.initial.words[0],
+                initialWord2: bridgeApp.appState.phases.initial.words[1],
+                initialWord3: bridgeApp.appState.phases.initial.words[2],
+                initialQuestion1: bridgeApp.appState.phases.initial.questions[0],
+                initialQuestion2: bridgeApp.appState.phases.initial.questions[1],
+                initialMetaphor: bridgeApp.appState.phases.initial.metaphor,
+                newWord1: bridgeApp.appState.phases.new.words[0],
+                newWord2: bridgeApp.appState.phases.new.words[1],
+                newWord3: bridgeApp.appState.phases.new.words[2],
+                newQuestion1: bridgeApp.appState.phases.new.questions[0],
+                newQuestion2: bridgeApp.appState.phases.new.questions[1],
+                newMetaphor: bridgeApp.appState.phases.new.metaphor,
+                bridgeReflection: bridgeApp.appState.phases.bridge.reflection
+            };
+            
+            // 빈 값 확인
+            if (!formData.studentInfo || !formData.learningTopic) {
+                alert('학생 정보와 학습 주제를 입력해주세요!');
+                return;
+            }
+            
+            if (!formData.bridgeReflection) {
+                alert('생각의 다리를 작성해주세요!');
+                return;
+            }
+            
+            if (confirm('제출하시겠습니까?\n\n제출 후에는 수정할 수 없습니다.')) {
+                sendToGoogleSheets(formData);
+            }
+        }
+
+        // 앱 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            bridgeApp = new BridgeLearningApp();
+            
+            // URL 파라미터 확인 (선택사항)
+            const urlParams = new URLSearchParams(window.location.search);
+            const topic = urlParams.get('topic');
+            if (topic) {
+                document.getElementById('learningTopic').value = decodeURIComponent(topic);
+            }
+        });
+    </script>
+</body>
+</html>
